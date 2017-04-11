@@ -12,6 +12,8 @@ this file and include it in basic-server.js so that it actually works.
 
 **************************************************************/
 // var exports = module.exports = {};
+var fs = require('fs');
+var stubby = require('./spec/Stubs');
 
 var defaultCorsHeaders = {
   'access-control-allow-origin': '*',
@@ -34,21 +36,45 @@ var requestHandler = function(request, response) {
 
   // Do some basic logging.
   //
-  // Adding more logging to your server can be an easy way to get passive
-  // debugging help, but you should always be careful about leaving stray
-  // console.logs in your code.
   console.log('Serving request type ' + request.method + ' for url ' + request.url);
+  var headers = defaultCorsHeaders;
+  var method = request.method;
+  var url = request.url;
+  var body = [];
+
+  if(request.method === 'OPTIONS'){
+    console.log('!OPTIONS');
+    var headers = {};
+    // IE8 does not allow domains to be specified, just the *
+    // headers["Access-Control-Allow-Origin"] = req.headers.origin;
+    headers["Access-Control-Allow-Origin"] = "*";
+    headers["Access-Control-Allow-Methods"] = "POST, GET, PUT, DELETE, OPTIONS";
+    headers["Access-Control-Allow-Credentials"] = true;
+    headers["Access-Control-Max-Age"] = '86400'; // 24 hours
+    headers["Access-Control-Allow-Headers"] = "X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept, Key, X-Parse-Application-Id, X-Parse-REST-API-Key";
+    stubby.response(200, headers);
+    stubby.end;
+  }
+
+  if(request.method === 'GET'){
+    console.log("what what?");
+  }
 
   // The outgoing status.
   var statusCode = 200;
-
-
+  body = Buffer.concat(body).toString();
+  fs.appendFile('./classes/messages.txt', 'test' , function (err) {
+    if (err) {
+      throw err;
+    } 
+    console.log('Saved!');
+  });
 
   // Tell the client we are sending them plain text.
   //
   // You will need to change this if you are sending something
   // other than plain text, like JSON or HTML.
-  headers['Content-Type'] = 'text/plain';
+  headers['Content-Type'] = 'application/jsonp';
 
   // .writeHead() writes to the request line and headers of the response,
   // which includes the status and all headers.

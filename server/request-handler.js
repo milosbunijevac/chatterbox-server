@@ -11,7 +11,7 @@ this file and include it in basic-server.js so that it actually works.
 *Hint* Check out the node module documentation at http://nodejs.org/api/modules.html.
 
 **************************************************************/
-var exports = module.exports = {};
+// var exports = module.exports = {};
 
 var defaultCorsHeaders = {
   'access-control-allow-origin': '*',
@@ -22,7 +22,7 @@ var defaultCorsHeaders = {
 // See the note below about CORS headers.
 var headers = defaultCorsHeaders;
 
-exports.requestHandler = function(request, response) {
+var requestHandler = function(request, response) {
   // Request and Response come from node's http module.
   //
   // They include information about both the incoming request, such as
@@ -77,3 +77,4 @@ exports.requestHandler = function(request, response) {
 
 
 //export requestHandler to basic-server to get it to work properly
+exports.requestHandler = requestHandler;

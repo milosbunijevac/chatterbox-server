@@ -68,6 +68,16 @@ var requestHandler = function(request, response) {
     response.writeHead(statusCode, headers);
     response.end(JSON.stringify({results: messages}));
   } else if (request.method === 'POST') {
+    var data = '';
+    request.on('data', function(pieces) {
+      data += pieces;
+      JSON.stringify(data);
+    });
+    request.on('end', function() {
+      JSON.parse(data);
+    });
+
+
     response.writeHead(statusCode, headers);
     messages.push({text: "text", username: "username"});
     response.end(JSON.stringify({results: messages}));

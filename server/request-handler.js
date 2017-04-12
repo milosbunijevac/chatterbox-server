@@ -21,6 +21,13 @@ var defaultCorsHeaders = {
   'access-control-allow-headers': 'content-type, accept',
   'access-control-max-age': 10 // Seconds.
 };
+
+var messages = [
+  {
+    text: "Hello World",
+    username: "Milos"
+  }
+];
 // See the note below about CORS headers.
 var headers = defaultCorsHeaders;
 
@@ -42,6 +49,8 @@ var requestHandler = function(request, response) {
   var url = request.url;
   var body = [];
 
+  var statusCode = 200;
+
   if(request.method === 'OPTIONS'){
     console.log('!OPTIONS');
     var headers = {};
@@ -52,29 +61,37 @@ var requestHandler = function(request, response) {
     headers["Access-Control-Allow-Credentials"] = true;
     headers["Access-Control-Max-Age"] = '86400'; // 24 hours
     headers["Access-Control-Allow-Headers"] = "X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept, Key, X-Parse-Application-Id, X-Parse-REST-API-Key";
+    headers["Content-type"] = "application/json";
     stubby.response(200, headers);
     stubby.end;
-  }
+  } else if (request.method === 'GET') {
+    response.writeHead(statusCode, headers);
+    response.end(JSON.stringify({results: messages}));
+  } else if (request.method === 'POST') {
+    response.writeHead(statusCode, headers);
+    messages.push({text: "text", username: "username"});
+    response.end(JSON.stringify({results: messages}));
+  } else if (request.method === 'PUT') {
 
-  if(request.method === 'GET'){
-    console.log("what what?");
+  } else if (request.method === 'DELETE') {
+
   }
 
   // The outgoing status.
-  var statusCode = 200;
-  body = Buffer.concat(body).toString();
-  fs.appendFile('./classes/messages.txt', 'test' , function (err) {
-    if (err) {
-      throw err;
-    } 
-    console.log('Saved!');
-  });
+
+  // body = Buffer.concat(body).toString();
+  // fs.appendFile('./classes/messages.txt', 'test' , function (err) {
+  //   if (err) {
+  //     throw err;
+  //   } 
+  //   console.log('Saved!');
+  // });
 
   // Tell the client we are sending them plain text.
   //
   // You will need to change this if you are sending something
   // other than plain text, like JSON or HTML.
-  headers['Content-Type'] = 'application/jsonp';
+  headers['Content-Type'] = 'application/json';
 
   // .writeHead() writes to the request line and headers of the response,
   // which includes the status and all headers.
@@ -87,7 +104,7 @@ var requestHandler = function(request, response) {
   //
   // Calling .end "flushes" the response's internal buffer, forcing
   // node to actually send all the data over to the client.
-  response.end('Hello, World!');
+  response.end(JSON.stringify('Hello, World!'));
 };
 
 // These headers will allow Cross-Origin Resource Sharing (CORS).
